@@ -1,100 +1,91 @@
 import './charInfo.scss';
-import { Component } from 'react';
-import MarvelService from '../../services/MarvelService';
+import { useEffect, useState } from 'react';
+import useMarvelService from '../../services/MarvelService';
 import ErrorMessage from '../errorMessage/errorMessage';
 import Skeleton from '../skeleton/Skeleton'
 import Spinner from '../spinner/Spiner';
 import PropTypes from 'prop-types'
+import { Link } from 'react-router-dom';
 
-class CharInfo extends Component {
+const CharInfo = (props) => {
 
-    marvelService = new MarvelService()
-    state = {
-        char:  null,
-        loading:false ,
-        error: false
+    const {loading , error , getCharacter , clearError} = useMarvelService()
+    const [char , setChar] =  useState(null)
+
+    const onCharLoaded = (char) => {
+        setChar(char)
     }
 
-    onCharLoaded = (char) => {
-        this.setState({char , loading:false})
-    }
-
-    onError = () => {
-        this.setState({loading:false , error:true})
-    }
-
-    onUpdadeChar = () => {
-        if(!this.props.charId) {
+    const onUpdateChar = () => {
+        clearError()
+        if(!props.charId) {
             return
         }
-        this.setState({loading:true})
-        this.marvelService.getCharacter(this.props.charId)
-        .then(this.onCharLoaded)
-        .catch(this.onError)
+        getCharacter(props.charId)
+        .then(onCharLoaded)
     }
 
-    componentDidMount() {
-        this.onUpdadeChar()
-    }
+    useEffect(() => {
+        onUpdateChar()
+    } ,[])
 
-    componentDidUpdate = (prevProps , prevState) => {
-        if(prevProps.charId !== this.props.charId) {
-            this.onUpdadeChar()
-        }
-    }
+    
+
+    useEffect(() => {
+        onUpdateChar()
+    } , [props.charId])
 
 
-    render() {
-        let {char , loading , error} = this.state ,
-        skeleton = loading || error || char ? null  : <Skeleton/> ,
-        spinner = loading ? <Spinner/> : null ,
-        errorMessage = error ? <ErrorMessage/> : null ,
-        content = !(spinner || errorMessage || !char) ? <View char={char}/> : null
+    let skeleton = loading || error || char ? null  : <Skeleton/> ,
+    spinner = loading ? <Spinner/> : null ,
+    errorMessage = error ? <ErrorMessage/> : null ,
+    content = !(spinner || errorMessage || !char) ? <View char={char}/> : null
 
-        return (
-            <div className="char__info">
-                {spinner}
-                {errorMessage}
-                {content}
-                {skeleton}
-            </div>
-        )
-    }
+    return (
+        <div className="char__info">
+            {spinner}
+            {errorMessage}
+            {content}
+            {skeleton}
+        </div>
+    )
 }
 
 const View = ({char}) => {
     const {name , thumbnail , description , wiki , homepage , comics} = char 
-    return <>
-        <div className="char__basics">
-                    <img src={thumbnail} alt={name} style={Boolean(thumbnail.search('image_not_available') + 1) ? {objectFit:"fill"} : {objectFit:'cover'}} />
-                    <div>
-                        <div className="char__info-name">{name}</div>
-                        <div className="char__btns">
-                            <a href={homepage} className="button button__main">
-                                <div className="inner">homepage</div>
-                            </a>
-                            <a href={wiki} className="button button__secondary">
-                                <div className="inner">wiki</div>
-                            </a>
+    return (
+        <>
+            <div className="char__basics">
+                        <img src={thumbnail} alt={name} style={Boolean(thumbnail.search('image_not_available') + 1) ? {objectFit:"fill"} : {objectFit:'cover'}} />
+                        <div>
+                            <div className="char__info-name">{name}</div>
+                            <div className="char__btns">
+                                <a href={homepage} className="button button__main">
+                                    <div className="inner">homepage</div>
+                                </a>
+                                <a href={wiki} className="button button__secondary">
+                                    <div className="inner">wiki</div>
+                                </a>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div className="char__descr">
-                    {description}
-                </div>
-                <div className="char__comics">Comics:</div>
-                <ul className="char__comics-list">
-                    {
-                       comics.length ?  comics.map((item , i) => {
-                            if(i > 10) return 
-                            return (<li className="char__comics-item" key={i}>
-                                    {item.name}
-                                </li>)
-                        }) : 'Haven`t any comics'
-                    }
-                 
-                </ul>
-    </>
+                    <div className="char__descr">
+                        {description}
+                    </div>
+                    <div className="char__comics">Comics:</div>
+                    <ul className="char__comics-list">
+                        {
+                        comics.length ?  comics.map((item , i) => {
+                                if(i > 10) return 
+                                return (<li  className="char__comics-item" key={i}>
+                                        <Link to={'./comics/' + item.resourceURI.slice(item.resourceURI.lastIndexOf('/') + 1)}>{item.name}</Link>
+                                    </li>)
+                            }) : 'Haven`t any comics'
+                        }
+                    
+                    </ul>
+        </>
+    )
 }
 
 CharInfo.propTypes = {

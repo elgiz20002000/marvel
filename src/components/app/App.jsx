@@ -1,43 +1,37 @@
+import { lazy, Suspense } from 'react';
+import { BrowserRouter as Router , Route , Routes } from 'react-router-dom';
 import AppHeader from "../appHeader/AppHeader";
-import RandomChar from "../randomChar/RandomChar";
-import CharList from "../charList/CharList";
-import CharInfo from "../charInfo/CharInfo";
+import Spinner from '../spinner/Spiner';
 
-import decoration from '../../resources/img/vision.png';
-import { Component } from "react";
-import ErrorBoundary from "../errorBoundary/errorBoundary";
 
-class App extends Component {
-    state = {
-        selected: null
-    }
+const MainPage = lazy(() => import('../pages/main_page')) ,
+ComicsPage = lazy(() => import('../pages/comics_page')) ,
+Page404 = lazy(() => import('../pages/page404')) ,
+SingleComic = lazy(() => import('../pages/SingleComic'))
 
-    onCharSelect = (id) => {
-        this.setState({
-            selected:id
-        })
-    }
-    render() {
-        return (
+
+
+const App = () => {
+    
+    return (
+        <Router>
             <div className="app">
                 <AppHeader/>
                 <main>
-                    <ErrorBoundary>
-                        <RandomChar/>
-                    </ErrorBoundary>
-                    <div className="char__content">
-                    <ErrorBoundary>
-                        <CharList onCharSelect={this.onCharSelect} charId={this.state.selected}/>
-                    </ErrorBoundary>
-                        <ErrorBoundary>
-                            <CharInfo charId={this.state.selected}/>
-                        </ErrorBoundary>
-                    </div>
-                    <img className="bg-decoration" src={decoration} alt="vision"/>
+                    <Suspense fallback={<Spinner/>}>
+                        <Routes>
+                            <Route  path={'/'} element={<MainPage/>}/>
+                            <Route  path={'/comics'} element={<ComicsPage/>}/>
+                            <Route  path={'/comics/:comicsId'} element={<SingleComic/>}/>
+                            <Route  path={'*'} element={<Page404/>}/>
+                        </Routes>
+                    </Suspense>
                 </main>
             </div>
-        )
-    }
+          
+        </Router>
+   
+    )
 }
 
 export default App;
