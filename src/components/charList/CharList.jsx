@@ -4,10 +4,11 @@ import useMarvelService from '../../services/MarvelService'
 import Spinner from '../spinner/Spiner';
 import ErrorMessage from '../errorMessage/errorMessage';
 import PropTypes from 'prop-types'
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 
 const CharList  = (props) => {
-
+    console.log('list')
     const {error , loading , getAllCharacters} = useMarvelService()
     const [chars , setChars] = useState([])
     const [newItemLoading , setNewItemLoading] = useState(false)
@@ -42,26 +43,6 @@ const CharList  = (props) => {
     } ,[])
 
 
-    const chars_items = chars.map((item , index) => {
-            let clazz = item.id === props.charId ? ' char__item char__item_selected' : 'char__item'
-
-            return (
-            <li className={clazz} key={item.id} 
-            onClick={() => {
-                props.onCharSelect(item.id)
-            }} 
-            onKeyDown={(e) => {
-                if(e.key === 'Enter') props.onCharSelect(item.id) 
-            }}
-            tabIndex={index + 1}>
-
-                <img src={item.thumbnail} 
-                style={Boolean(item.thumbnail.search('image_not_available') + 1 || item.thumbnail.match('http://i.annihil.us/u/prod/marvel/i/mg/f/60/4c002e0305708.gif')) ? {objectFit:"fill"} : {objectFit:'cover'}} 
-                alt={item.name}/>
-
-                <div className="char__name">{item.name}</div>
-            </li>)
-    })
 
     let spinner = (loading && !newItemLoading) ? <Spinner/> : null ,
     errorMessage = error ? <ErrorMessage/> : null
@@ -71,7 +52,7 @@ const CharList  = (props) => {
         <div className="char__list">
             {spinner}
             {errorMessage}
-            <View chars_items={chars_items}/>
+            <View upProp={props} chars={chars} />
             <button className="button button__main button__long" 
             onClick={() => onRequest(offset)} 
             disabled={newItemLoading}
@@ -82,9 +63,34 @@ const CharList  = (props) => {
     )
 }
 
-const View = ({chars_items}) => {
+const View = ({upProp , chars}) => {
     return  <ul className="char__grid">
-        {chars_items}
+             <TransitionGroup component={null}>
+                {
+                    chars.map((item , index) => (                        
+                        <CSSTransition
+                        timeout={300}
+                        classNames={'char__item'}
+                        key={item.id}>
+                            <li 
+                            className={item.id === upProp.charId ? ' char__item char__item_selected' : 'char__item'}  
+                            onClick={() => upProp.onCharSelect(item.id)}
+                            onKeyDown={(e) => {
+                                if(e.key === 'Enter') upProp.onCharSelect(item.id) 
+                            }}
+                            tabIndex={index + 1}>
+
+                                    <img src={item.thumbnail} 
+                                    style={Boolean(item.thumbnail.search('image_not_available') + 1 || item.thumbnail.match('http://i.annihil.us/u/prod/marvel/i/mg/f/60/4c002e0305708.gif')) ? {objectFit:"fill"} : {objectFit:'cover'}} 
+                                    alt={item.name}/>
+
+                                    <div className="char__name">{item.name}</div>
+                            </li>
+                        </CSSTransition>
+                        ) 
+                    )
+                }
+            </TransitionGroup> 
     </ul>
 }
 

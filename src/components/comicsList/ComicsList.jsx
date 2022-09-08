@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Spinner from '../spinner/Spiner';
 import ErrorMessage from '../errorMessage/errorMessage';
 import { Link } from 'react-router-dom';
+import { TransitionGroup , CSSTransition } from 'react-transition-group';
 
 const ComicsList = () => {
     const {error , loading , getAllComics} = useMarvelService()
@@ -43,18 +44,6 @@ const ComicsList = () => {
 
 
 
-    const comics_items = comics.map((item , index) => {
-
-            return (
-                <li className="comics__item" key={index}   style={{cursor:'pointer'}}>
-                <Link to={'/comics/' + item.id}>
-                    <img src={item.thumbnail} alt={item.title} className="comics__item-img"/>
-                    <div className="comics__item-name">{item.title}</div>
-                    <div className="comics__item-price">{item.price}</div>
-                </Link>
-            </li>
-            )
-    })
 
     let spinner = (loading && !newItemLoading) ? <Spinner/> : null ,
     errorMessage = error ? <ErrorMessage/> : null
@@ -65,7 +54,7 @@ const ComicsList = () => {
         <div className="comics__list">
             {spinner}
             {errorMessage}
-            <View comics_items={comics_items}/>
+            <View comics={comics}/>
             <button onClick={() => onRequest(offset)} disabled={newItemLoading} className="button button__main button__long">
                 <div className="inner">load more</div>
             </button>
@@ -73,9 +62,28 @@ const ComicsList = () => {
     )
 }
 
-const View = ({comics_items}) => {
+const View = ({comics}) => {
     return  <ul className="comics__grid">
-        {comics_items}
+        <TransitionGroup component={null}>
+                {
+                    comics.map((item , index) => {
+                        return (
+                                <CSSTransition
+                                    timeout={300}
+                                    classNames={'comics__item'}
+                                    key={item.id}>
+                                    <li className="comics__item" key={index}   style={{cursor:'pointer'}}>
+                                        <Link to={'/comics/' + item.id}>
+                                            <img src={item.thumbnail} alt={item.title} className="comics__item-img"/>
+                                            <div className="comics__item-name">{item.title}</div>
+                                            <div className="comics__item-price">{item.price}</div>
+                                        </Link>
+                                    </li>
+                                </CSSTransition>
+                        )
+                    })
+                }  
+            </TransitionGroup> 
     </ul>
 }
 

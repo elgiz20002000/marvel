@@ -4,6 +4,7 @@ import CharInfo from "../charInfo/CharInfo";
 import decoration from '../../resources/img/vision.png';
 import { useCallback, useState } from "react";
 import ErrorBoundary from "../errorBoundary/errorBoundary";
+import { SearchForm } from "../SearchForm/SearchForm";
 
 const MainPage = () => {
      
@@ -19,9 +20,14 @@ const MainPage = () => {
         <ErrorBoundary>
             <CharList onCharSelect={onCharSelect} charId={selected}/>
         </ErrorBoundary>
-            <ErrorBoundary>
+        <div>
+        <ErrorBoundary>
                 <CharInfo charId={selected}/>
             </ErrorBoundary>
+            <ErrorBoundary>
+                <SearchForm/>
+            </ErrorBoundary>
+        </div>
         </div>
         <img className="bg-decoration" src={decoration} alt="vision"/>
    </>)
