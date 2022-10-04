@@ -1,13 +1,12 @@
 import './comicsList.scss';
 import useMarvelService from '../../services/MarvelService';
 import { useEffect, useState } from 'react';
-import Spinner from '../spinner/Spiner';
-import ErrorMessage from '../errorMessage/errorMessage';
 import { Link } from 'react-router-dom';
 import { TransitionGroup , CSSTransition } from 'react-transition-group';
+import { customSetContent } from '../utils/setContent';
 
 const ComicsList = () => {
-    const {error , loading , getAllComics} = useMarvelService()
+    const {getAllComics , process , setProcess} = useMarvelService()
     const [comics , setComics] = useState([])
     const [newItemLoading , setNewItemLoading] = useState(false)
     const [offset , setOffset] = useState(210)
@@ -39,22 +38,20 @@ const ComicsList = () => {
         initial ? setNewItemLoading(false) : setNewItemLoading(true);
         getAllComics(offset)
         .then(onComicsLoaded)
+        .then(() => setProcess('confirmed'))
     }
 
 
 
 
 
-    let spinner = (loading && !newItemLoading) ? <Spinner/> : null ,
-    errorMessage = error ? <ErrorMessage/> : null
 
 
 
     return (
         <div className="comics__list">
-            {spinner}
-            {errorMessage}
-            <View comics={comics}/>
+            {customSetContent(process , () => renderItems(comics) , newItemLoading)}
+           
             <button onClick={() => onRequest(offset)} disabled={newItemLoading} className="button button__main button__long">
                 <div className="inner">load more</div>
             </button>
@@ -62,7 +59,7 @@ const ComicsList = () => {
     )
 }
 
-const View = ({comics}) => {
+const renderItems = (comics) => {
     return  <ul className="comics__grid">
         <TransitionGroup component={null}>
                 {
@@ -74,7 +71,7 @@ const View = ({comics}) => {
                                     key={item.id}>
                                     <li className="comics__item" key={index}   style={{cursor:'pointer'}}>
                                         <Link to={'/comics/' + item.id}>
-                                            <img src={item.thumbnail} alt={item.title} className="comics__item-img"/>
+                                            <img loading='lazy' src={item.thumbnail} alt={item.title} className="comics__item-img"/>
                                             <div className="comics__item-name">{item.title}</div>
                                             <div className="comics__item-price">{item.price}</div>
                                         </Link>

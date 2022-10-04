@@ -7,7 +7,7 @@ const useMarvelService = () => {
     const _apiKey = `apikey=0807b3851d1dd789c145f77155d53596`
     const _offsetValue = 210
 
-    const {request , clearError , error , loading} = useHttp()
+    const {request , clearError , process , setProcess} = useHttp()
 
   
 
@@ -61,7 +61,7 @@ const useMarvelService = () => {
         }
     }
 
-    return { clearError , error , loading , getAllCharacters, getCharacter , getAllComics , getComics , getCharacterByName}
+    return { clearError , getAllCharacters, getCharacter , getAllComics , getComics , getCharacterByName , process , setProcess}
 }
 
  
