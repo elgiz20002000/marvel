@@ -8,9 +8,7 @@ import { useRef } from 'react';
 import { customSetContent } from '../utils/setContent';
 
 
-
 const CharList  = (props) => {
-    console.log('list')
     const { getAllCharacters , process , setProcess} = useMarvelService()
     const [chars , setChars] = useState([])
     const [newItemLoading , setNewItemLoading] = useState(false)

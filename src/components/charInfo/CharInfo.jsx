@@ -4,9 +4,9 @@ import useMarvelService from '../../services/MarvelService';
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom';
 import { setContent } from '../utils/setContent';
+import { useMemo } from 'react';
 
 const CharInfo = (props) => {
-
     const {getCharacter , clearError , process , setProcess} = useMarvelService()
     const [char , setChar] =  useState(null)
 
@@ -25,22 +25,21 @@ const CharInfo = (props) => {
 
     }
 
-    useEffect(() => {
-        onUpdateChar()
-    } ,[])
+ 
 
-    
 
     useEffect(() => {
         onUpdateChar()
     } , [props.charId])
 
 
-
-
+    let elem =  useMemo(() => {
+       return setContent(process , View , char)
+    } , [process])
+  
     return (
         <div className="char__info">
-            {setContent(process , View , char)}
+            {elem}
         </div>
     )
 }

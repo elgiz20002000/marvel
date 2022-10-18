@@ -1,6 +1,7 @@
 import ErrorMessage from "../errorMessage/errorMessage"
 import Skeleton from "../skeleton/Skeleton"
 import Spinner from "../spinner/Spiner"
+
 export const setContent = (process , Component , data) => {
     switch(process) {
         case 'waiting':

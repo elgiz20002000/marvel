@@ -25,7 +25,7 @@ const useHttp = () => {
       },[])
 
     const clearError = useCallback(() => {
-        setProcess('loading')
+        setProcess('waiting')
     } , [])
 
     return { request , clearError , process , setProcess}
